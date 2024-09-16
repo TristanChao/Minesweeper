@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BiSolidBomb } from 'react-icons/bi';
 
 export function GameBoard() {
   const [board, setBoard] = useState<JSX.Element[]>([]);
@@ -30,7 +31,25 @@ export function GameBoard() {
         row = [];
       }
 
-      row.push(<Tile key={i} hasBomb={bombArray.includes(i)} />);
+      let numAdjBombs = 0;
+
+      // above
+      if (bombArray.includes(i - 21)) numAdjBombs++;
+      if (bombArray.includes(i - 20)) numAdjBombs++;
+      if (bombArray.includes(i - 19)) numAdjBombs++;
+
+      // next
+      if (bombArray.includes(i - 1)) numAdjBombs++;
+      if (bombArray.includes(i + 1)) numAdjBombs++;
+
+      // below
+      if (bombArray.includes(i + 19)) numAdjBombs++;
+      if (bombArray.includes(i + 20)) numAdjBombs++;
+      if (bombArray.includes(i + 21)) numAdjBombs++;
+
+      row.push(
+        <Tile key={i} hasBomb={bombArray.includes(i)} tileNum={numAdjBombs} />,
+      );
     }
 
     setBoard(board);
@@ -41,8 +60,28 @@ export function GameBoard() {
 
 type TileProps = {
   hasBomb: boolean;
+  tileNum: number;
 };
 
-function Tile({ hasBomb }: TileProps) {
-  return <div className="tile">{hasBomb && '|||'}</div>;
+function Tile({ hasBomb, tileNum }: TileProps) {
+  // const [isClicked, setIsClicked] = useState(false);
+
+  let numLabel = '';
+  let clickedColor = '';
+  if (tileNum > 0) {
+    numLabel = tileNum.toString();
+  } else if (!hasBomb) {
+    clickedColor = 'lightgrey';
+  }
+
+  const content = hasBomb ? <BiSolidBomb /> : numLabel;
+
+  return <div className={`tile ${clickedColor}`}>{content}</div>;
+  // return (
+  //   <div
+  //     className={`tile ${isClicked && clickedColor}`}
+  //     onClick={() => setIsClicked(true)}>
+  //     {isClicked && content}
+  //   </div>
+  // );
 }
