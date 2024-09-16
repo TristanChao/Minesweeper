@@ -1,0 +1,36 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.board {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid;
+  width: calc(27px * 20);
+}
+
+.row {
+  display: flex;
+  width: fit-content;
+}
+
+.tile {
+  border: 1px solid;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile:hover {
+  background-color: rgb(228, 228, 228);
+}
+
+.tile.lightgrey {
+  background-color: rgb(180, 180, 180);
+}
