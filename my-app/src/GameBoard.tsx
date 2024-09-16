@@ -1,9 +1,31 @@
 import { useEffect, useState } from 'react';
 import { BiSolidBomb } from 'react-icons/bi';
 
-export function GameBoard() {
-  const [board, setBoard] = useState<JSX.Element[]>([]);
+function checkAdj(array: number[], i: number): number[] {
+  const indexes = [];
 
+  // above
+  if (array.includes(i - 21)) indexes.push(i - 21);
+  if (array.includes(i - 20)) indexes.push(i - 20);
+  if (array.includes(i - 19)) indexes.push(i - 19);
+
+  // next
+  if (array.includes(i - 1)) indexes.push(i - 1);
+  if (array.includes(i + 1)) indexes.push(i + 1);
+
+  // below
+  if (array.includes(i + 19)) indexes.push(i + 19);
+  if (array.includes(i + 20)) indexes.push(i + 20);
+  if (array.includes(i + 21)) indexes.push(i + 21);
+
+  return indexes;
+}
+
+export function GameBoard() {
+  const [board, setBoard] = useState<JSX.Element[]>();
+
+  // this effect will generate an array of numbers that represents the tiles that have bombs
+  // it will then create a grid of tiles
   useEffect(() => {
     const boardSize = 20;
     let numBombs = Math.floor(boardSize * 4.25);
@@ -17,10 +39,12 @@ export function GameBoard() {
       }
     }
     bombArray.sort((a, b) => a - b);
-    console.log(bombArray);
 
     const board: JSX.Element[] = [];
     let row: JSX.Element[] = [];
+
+    const blankTiles: number[] = [];
+
     for (let i = 0; i < 400; i++) {
       if (i > 0 && i % 20 === 0) {
         board.push(
@@ -31,21 +55,11 @@ export function GameBoard() {
         row = [];
       }
 
-      let numAdjBombs = 0;
+      const numAdjBombs = checkAdj(bombArray, i).length;
 
-      // above
-      if (bombArray.includes(i - 21)) numAdjBombs++;
-      if (bombArray.includes(i - 20)) numAdjBombs++;
-      if (bombArray.includes(i - 19)) numAdjBombs++;
-
-      // next
-      if (bombArray.includes(i - 1)) numAdjBombs++;
-      if (bombArray.includes(i + 1)) numAdjBombs++;
-
-      // below
-      if (bombArray.includes(i + 19)) numAdjBombs++;
-      if (bombArray.includes(i + 20)) numAdjBombs++;
-      if (bombArray.includes(i + 21)) numAdjBombs++;
+      if (numAdjBombs === 0 && !bombArray.includes(i)) {
+        blankTiles.push(i);
+      }
 
       row.push(
         <Tile key={i} hasBomb={bombArray.includes(i)} tileNum={numAdjBombs} />,
@@ -64,7 +78,7 @@ type TileProps = {
 };
 
 function Tile({ hasBomb, tileNum }: TileProps) {
-  // const [isClicked, setIsClicked] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
 
   let numLabel = '';
   let clickedColor = '';
@@ -76,12 +90,20 @@ function Tile({ hasBomb, tileNum }: TileProps) {
 
   const content = hasBomb ? <BiSolidBomb /> : numLabel;
 
-  return <div className={`tile ${clickedColor}`}>{content}</div>;
   // return (
   //   <div
-  //     className={`tile ${isClicked && clickedColor}`}
-  //     onClick={() => setIsClicked(true)}>
-  //     {isClicked && content}
+  //     onClick={() => setIsClicked(onClick(index))}
+  //     className={`tile ${clickedColor}`}>
+  //     {content}
   //   </div>
   // );
+  return (
+    <div
+      className={`tile ${isClicked && clickedColor}`}
+      onClick={() => {
+        setIsClicked(true);
+      }}>
+      {isClicked && content}
+    </div>
+  );
 }
